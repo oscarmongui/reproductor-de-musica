@@ -8,7 +8,7 @@ const iconoplay = document.getElementById("iconoplay");
 const botonReproducirPausar = document.querySelector(".controles button.boton-reproducir-pausar");
 
 const botonAtras = document.querySelector(".controles button.atras");
-const botonAdelante = document.querySelector(".controles button.adelante");
+const botonAdelante = document.querySelector(".controles button.siguiente");
 
 const canciones = [
     {
@@ -81,7 +81,10 @@ function actualizarInfoCancion(){
     cancion.src = canciones[indiceCancionActual].fuente;
     cancion.addEventListener("loadeddata",function(){});
 };
-
+cancion.addEventListener("loadedmetadata",function(){
+    progreso.max = cancion.duration;
+    progreso.value = cancion.currentTime;
+})
 botonReproducirPausar.addEventListener("click",reproducirPausar);
 
 function reproducirPausar () {
@@ -103,4 +106,28 @@ function reproducirCancion() {
 function pausarCancion(){
     cancion.pause();
 }
+cancion.addEventListener("timeupdate",function() {
+    if(!cancion.paused){
+        progreso.value = cancion.currentTime
+    }
+});
+progreso.addEventListener("input",function(){
+    cancion.currentTime = progreso.value;
+})
+botonAdelante.addEventListener("click",()=>{
+    indiceCancionActual = (indiceCancionActual + 1) % canciones.length;
+    actualizarInfoCancion();
+    reproducirCancion();
+    
+})
+cancion.addEventListener("ended", () => {
+    indiceCancionActual = (indiceCancionActual + 1) % canciones.length;
+    actualizarInfoCancion();
+    reproducirCancion();
+});
+botonAtras.addEventListener("click",()=>{
+    indiceCancionActual = (indiceCancionActual - 1 + canciones.length) % canciones.length;
+    actualizarInfoCancion();
+    reproducirCancion();
+})
 actualizarInfoCancion();
